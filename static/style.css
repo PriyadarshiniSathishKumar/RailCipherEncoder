@@ -1,0 +1,108 @@
+/* Custom styles for the cryptography tool */
+
+.result-text {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    padding: 1rem;
+    background-color: var(--bs-gray-900);
+    border-radius: 0.375rem;
+    border: 1px solid var(--bs-border-color);
+    word-break: break-all;
+    line-height: 1.6;
+}
+
+.result-text.encrypted {
+    background-color: var(--bs-success-bg-subtle);
+    border-color: var(--bs-success-border-subtle);
+    color: var(--bs-success-text-emphasis);
+}
+
+.card {
+    border: 1px solid var(--bs-border-color);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background-color: var(--bs-primary-bg-subtle);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.display-4 {
+    font-weight: 300;
+    color: var(--bs-heading-color);
+}
+
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    background-color: var(--bs-primary-text-emphasis);
+    border-color: var(--bs-primary-text-emphasis);
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.text-muted {
+    opacity: 0.75;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .result-text {
+        font-size: 0.9rem;
+        padding: 0.75rem;
+    }
+    
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* Animation for success states */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Copy button styling */
+.btn-outline-secondary {
+    border-color: var(--bs-secondary);
+    color: var(--bs-secondary);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+    color: white;
+}

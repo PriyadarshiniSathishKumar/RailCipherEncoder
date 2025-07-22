@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Tool - Rail Fence & Row Transposition Ciphers</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container my-5">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 mb-3">
+                <i class="fas fa-lock me-3"></i>
+                Cryptography Tool
+            </h1>
+            <p class="lead text-muted">Encrypt messages using Rail Fence and Row Transposition ciphers</p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-8">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Input Form -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-edit me-2"></i>
+                            Message Encryption
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('encrypt') }}">
+                            <!-- Message Input -->
+                            <div class="mb-4">
+                                <label for="message" class="form-label">
+                                    <i class="fas fa-comment me-1"></i>
+                                    Message to Encrypt
+                                </label>
+                                <textarea class="form-control" id="message" name="message" rows="3" 
+                                          placeholder="Enter your message here..." required>{{ message if message }}</textarea>
+                                <div class="form-text">Enter the plaintext message you want to encrypt.</div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Rail Fence Cipher Key -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="rail_fence_key" class="form-label">
+                                        <i class="fas fa-railroad-track me-1"></i>
+                                        Rail Fence Key (Number of Rails)
+                                    </label>
+                                    <input type="number" class="form-control" id="rail_fence_key" 
+                                           name="rail_fence_key" min="2" max="20" 
+                                           placeholder="e.g., 3" value="{{ rail_fence_key if rail_fence_key }}">
+                                    <div class="form-text">Number of rails for the fence (minimum 2).</div>
+                                </div>
+
+                                <!-- Row Transposition Cipher Key -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="row_transposition_key" class="form-label">
+                                        <i class="fas fa-key me-1"></i>
+                                        Row Transposition Key (Keyword)
+                                    </label>
+                                    <input type="text" class="form-control" id="row_transposition_key" 
+                                           name="row_transposition_key" pattern="[A-Za-z]+" 
+                                           placeholder="e.g., CRYPTO" value="{{ row_transposition_key if row_transposition_key }}">
+                                    <div class="form-text">Keyword for column ordering (letters only).</div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    Encrypt Message
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        {% if results %}
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <h2 class="text-center mb-4">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Encryption Results
+                </h2>
+                
+                <!-- Original Message -->
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-file-alt me-2"></i>
+                            Original Message
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="result-text">{{ message }}</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Rail Fence Cipher Result -->
+                    {% if results.rail_fence %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h4 class="card-title mb-0">
+                                    <i class="fas fa-railroad-track me-2"></i>
+                                    Rail Fence Cipher
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <strong>Key (Rails):</strong> {{ results.rail_fence.key }}
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Encrypted Message:</strong>
+                                </div>
+                                <div class="result-text encrypted">{{ results.rail_fence.encrypted }}</div>
+                                <button class="btn btn-outline-secondary btn-sm mt-3" 
+                                        onclick="copyToClipboard('{{ results.rail_fence.encrypted }}')">
+                                    <i class="fas fa-copy me-1"></i>
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Row Transposition Cipher Result -->
+                    {% if results.row_transposition %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h4 class="card-title mb-0">
+                                    <i class="fas fa-key me-2"></i>
+                                    Row Transposition Cipher
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <strong>Key (Keyword):</strong> {{ results.row_transposition.key }}
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Encrypted Message:</strong>
+                                </div>
+                                <div class="result-text encrypted">{{ results.row_transposition.encrypted }}</div>
+                                <button class="btn btn-outline-secondary btn-sm mt-3" 
+                                        onclick="copyToClipboard('{{ results.row_transposition.encrypted }}')">
+                                    <i class="fas fa-copy me-1"></i>
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Cipher Information -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Cipher Information
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Rail Fence Cipher</h5>
+                                        <p class="text-muted">
+                                            The Rail Fence cipher writes the message in a zigzag pattern across multiple rails, 
+                                            then reads off the characters row by row to create the encrypted message.
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Row Transposition Cipher</h5>
+                                        <p class="text-muted">
+                                            The Row Transposition cipher arranges the message in a grid and reorders the columns 
+                                            based on the alphabetical order of the keyword letters.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
